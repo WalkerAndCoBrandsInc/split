@@ -5,6 +5,7 @@ module Split
     attr_accessor :experiment_name
     attr_accessor :weight
     attr_accessor :recorded_info
+    attr_accessor :token
 
     def initialize(name, experiment_name)
       @experiment_name = experiment_name
@@ -16,6 +17,20 @@ module Split
         @weight = 1
       end
       p_winner = 0.0
+
+      load_config
+    end
+
+    def load_config
+      config = Split.redis.hgetall(key)
+
+      parsed_token = if !config['token'].blank?
+        config['token']
+      else
+        rand(36**8).to_s(36)
+      end
+
+      @token = parsed_token
     end
 
     def to_s
@@ -156,6 +171,7 @@ module Split
       Split.redis.hsetnx key, 'completed_count', 0
       Split.redis.hsetnx key, 'p_winner', p_winner
       Split.redis.hsetnx key, 'recorded_info', (@recorded_info || {}).to_json
+      Split.redis.hset(key, :token, token.to_s)
     end
 
     def validate!
@@ -176,6 +192,10 @@ module Split
 
     def delete
       Split.redis.del(key)
+    end
+
+    def url
+      "#{experiment.token}.#{token}"
     end
 
     private

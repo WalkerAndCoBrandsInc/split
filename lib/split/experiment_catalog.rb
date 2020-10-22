@@ -17,6 +17,15 @@ module Split
       Experiment.new(name).tap { |exp| exp.load_from_redis }
     end
 
+    def self.find_by_token(token)
+      key = "token:#{token}"
+      return unless Split.redis.exists(key)
+      experiment_name = Split.redis.get(key)
+      return unless Split.redis.exists(experiment_name)
+
+      Experiment.new(experiment_name).tap { |exp| exp.load_from_redis }
+    end
+
     def self.find_or_initialize(metric_descriptor, control = nil, *alternatives)
       # Check if array is passed to ab_test
       # e.g. ab_test('name', ['Alt 1', 'Alt 2', 'Alt 3'])

@@ -8,6 +8,7 @@ module Split
     attr_accessor :alternatives
     attr_accessor :alternative_probabilities
     attr_accessor :metadata
+    attr_accessor :token
 
     DEFAULT_OPTIONS = {
       :resettable => true
@@ -71,9 +72,23 @@ module Split
 
       set_alternatives_and_options(options)
 
+      load_config
+
       # calculate probability that each alternative is the winner
       @alternative_probabilities = {}
       alts
+    end
+
+    def load_config
+      config = redis.hgetall(experiment_config_key)
+
+      parsed_token = if !config['token'].blank?
+        config['token']
+      else
+        rand(36**8).to_s(36)
+      end
+
+      @token = parsed_token
     end
 
     def save
@@ -89,6 +104,9 @@ module Split
 
       redis.hset(experiment_config_key, :resettable, resettable)
       redis.hset(experiment_config_key, :algorithm, algorithm.to_s)
+      redis.hset(experiment_config_key, :token, token.to_s)
+      redis.set("token:#{token}", name)
+
       self
     end
 
@@ -464,6 +482,7 @@ module Split
       goals_collection.delete
       delete_metadata
       redis.del(@name)
+      redis.del("token:#{@name}")
     end
 
     def experiment_configuration_has_changed?
