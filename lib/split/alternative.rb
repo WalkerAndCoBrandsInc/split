@@ -19,6 +19,7 @@ module Split
       p_winner = 0.0
 
       load_config
+      save
     end
 
     def load_config
