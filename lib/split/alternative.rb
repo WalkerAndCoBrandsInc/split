@@ -96,8 +96,8 @@ module Split
       Split.redis.hset(key, field, count.to_i)
     end
 
-    def increment_participation
-      Split.redis.hincrby key, 'participant_count', 1
+    def increment_participation(by: 1)
+      Split.redis.hincrby key, 'participant_count', by
     end
 
     def increment_completion(goal = nil)
