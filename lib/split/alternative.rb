@@ -159,6 +159,7 @@ module Split
 
       if value.kind_of?(Numeric)
         @recorded_info[k] ||= 0
+        @recorded_info[k] = convert(@recorded_info[k])
         @recorded_info[k] += value
       else
         @recorded_info[k] = value
@@ -207,6 +208,16 @@ module Split
 
     def key
       "#{experiment_name}:#{name}"
+    end
+
+    def convert(number)
+      [:Integer, :Float].each do |m|
+        begin
+          return Kernel.method(m).call(number)
+        rescue ArgumentError
+        end
+      end
+      nil
     end
   end
 end
