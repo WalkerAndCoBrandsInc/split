@@ -75,7 +75,14 @@
           <% end %>
           <% if experiment.token && alternative.token %>
             <div style="margin-top: 5px; margin-bottom: 5px;">
-              <em>url</em> <strong><%= alternative.url %></strong>
+              <em>url</em>
+              <strong>
+                <%- if Split.configuration.experiment_query_string %>
+                  <a href="<%= alternative.url %>" target="_blank"><%= alternative.url_token %></a>
+                <% else %>
+                  <%= alternative.url_token %>
+                <% end%>
+              </strong>
             </div>
           <% end %>
           <form action="<%= url('force_alternative') + '?experiment=' + experiment.name %>" method='post'>

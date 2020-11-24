@@ -197,6 +197,12 @@ module Split
     end
 
     def url
+      return url_token unless Split.configuration.experiment_query_string
+
+      "/?#{Split.configuration.experiment_query_string}=#{url_token}"
+    end
+
+    def url_token
       "#{experiment.token}.#{token}"
     end
 

@@ -27,6 +27,7 @@ module Split
     attr_accessor :beta_probability_simulations
     attr_accessor :winning_alternative_recalculation_interval
     attr_accessor :redis
+    attr_accessor :experiment_query_string
 
     attr_reader :experiments
 
